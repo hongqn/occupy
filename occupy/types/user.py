@@ -1,5 +1,7 @@
 from occupy.resource import Type
 
+@Type.register('user')
 class User(Type):
-    name = 'user'
-
+    @classmethod
+    def iter_all(cls):
+        return ['hongqn']

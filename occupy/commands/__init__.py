@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+import logging
 
 def main():
     parser = ArgumentParser()
@@ -8,6 +9,8 @@ def main():
     subcommands = [
         ('resource', 'resource',
          "API only: interact directly with resources via the RAL."),
+        ('apply', 'apply',
+         "Apply occupy manifests locally"),
     ]
 
     for command, module_name, help_text in subcommands:
@@ -18,4 +21,8 @@ def main():
         subparser.set_defaults(func=module.main)
 
     args = parser.parse_args()
+
+    logging.basicConfig(level=logging.INFO,
+                        format="%(levelname)s: %(resource)s: %(message)s")
+
     return args.func(args)

@@ -1,7 +1,17 @@
 import pkgutil
+import logging
 
-class Type(object):
+logger = logging.getLogger(__name__)
+
+class Resource(object):
     registry = {}
+
+    def __init__(self, name):
+        self.name = name
+        self.logger = logging.LoggerAdapter(logger, {'resource': self})
+
+    def __str__(self):
+        return "{self.__class__.__name__}({self.name!r})".format(self=self)
 
     @classmethod
     def get(cls, name):

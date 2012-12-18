@@ -2,7 +2,7 @@ from subprocess import check_call
 
 from occupy.resource import Resource, NAMEVAR
 
-@Resource.register('command')
+@Resource.register
 class Command(Resource):
     params = {
         'command': NAMEVAR,

@@ -1,7 +1,7 @@
 import argparse
 import textwrap
 
-from occupy.resource import Resource
+from occupy.resource import scan_package, Resource
 import occupy.types
 
 def populate_argparser(parser):
@@ -23,7 +23,7 @@ def populate_argparser(parser):
     parser.add_argument('type')
 
 def main(args):
-    Resource.scan_package(occupy.types)
+    scan_package(occupy.types)
     type = Resource.get(args.type)
     if type is None:
         return "Could not find type %s" % args.type

@@ -1,3 +1,7 @@
-from occupy.types.command import Command
+from occupy.resource import Resource, scan_package
+import occupy.types
 
-__all__ = ['Command']
+scan_package(occupy.types)
+globals().update(Resource.registry)
+__all__ = Resource.registry.keys()
+

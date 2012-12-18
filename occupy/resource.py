@@ -1,14 +1,25 @@
 import pkgutil
 import logging
 
+NAMEVAR = object()
+
 logger = logging.getLogger(__name__)
+
+class InvalidParameter(Exception):
+    pass
+
 
 class Resource(object):
     registry = {}
 
-    def __init__(self, name):
+    def __init__(self, name, **params):
         self.name = name
         self.logger = logging.LoggerAdapter(logger, {'resource': self})
+        for para, default in self.params.items():
+            if default is NAMEVAR and para not in params:
+                setattr(self, para, name)
+            else:
+                setattr(self, para, params.get(para, default))
 
     def __str__(self):
         return "{self.__class__.__name__}({self.name!r})".format(self=self)

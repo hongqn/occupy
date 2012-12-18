@@ -21,7 +21,7 @@ occupy = occupy.commands:main
 """
 
 # dependencies
-INSTALL_REQUIRES = []
+INSTALL_REQUIRES = ['colorlog']
 TESTS_REQUIRE = ['nose']
 TEST_SUITE = 'nose.collector'
 

@@ -1,6 +1,8 @@
 from argparse import ArgumentParser
 import logging
 
+from colorlog import ColoredFormatter
+
 def main():
     parser = ArgumentParser()
     subparsers = parser.add_subparsers(title="Available subcommands",
@@ -22,7 +24,15 @@ def main():
 
     args = parser.parse_args()
 
-    logging.basicConfig(level=logging.INFO,
-                        format="%(levelname)s: %(resource)s: %(message)s")
+    setup_logger()
 
     return args.func(args)
+
+def setup_logger():
+    formatter = ColoredFormatter(
+        "%(log_color)s%(levelname)s: %(resource)s: %(message)s")
+    root = logging.getLogger()
+    handler = logging.StreamHandler()
+    handler.setFormatter(formatter)
+    root.addHandler(handler)
+    root.setLevel(logging.INFO)

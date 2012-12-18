@@ -15,10 +15,9 @@ class File(Resource):
             raise InvalidParameter("File paths must be fully qualified, not %r" % self.path)
 
     def __call__(self):
-        if os.path.exists(self.path):
-            current_content = open(self.path, 'rb').read()
-        else:
-            current_content = None
+        exists = os.path.exists(self.path)
+        content = open(self.path, 'rb').read() if exists else None
 
-        if current_content != self.content:
+        if content != self.content:
             open(self.path, 'wb').write(self.content)
+            self.logger.info("updated" if exists else "created")

@@ -30,7 +30,7 @@ def main():
 
 def setup_logger():
     formatter = ColoredFormatter(
-        "%(log_color)s%(levelname)s: %(resource)s: %(message)s")
+        "%(log_color)s%(levelname)s: %(message)s")
     root = logging.getLogger()
     handler = logging.StreamHandler()
     handler.setFormatter(formatter)

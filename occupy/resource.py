@@ -8,13 +8,17 @@ logger = logging.getLogger(__name__)
 class InvalidParameter(Exception):
     pass
 
+class ResourceLogger(logging.LoggerAdapter):
+    def process(self, msg, kwargs):
+        msg = "%s: %s" % (self.extra['resource'], msg)
+        return msg, kwargs
 
 class Resource(object):
     registry = {}
 
     def __init__(self, name, **params):
         self.name = name
-        self.logger = logging.LoggerAdapter(logger, {'resource': self})
+        self.logger = ResourceLogger(logger, {'resource': self})
         for para, default in self.params.items():
             if default is NAMEVAR and para not in params:
                 setattr(self, para, name)

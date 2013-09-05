@@ -29,4 +29,4 @@ def main(args):
         return "Could not find type %s" % args.type
 
     for resource in type.iter_all():
-        print resource
+        print(resource)

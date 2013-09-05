@@ -9,7 +9,7 @@ def main(args):
     start_time = time.time()
 
     env = {}
-    execfile(args.file, env)
+    exec(open(args.file).read(), env)
 
     def apply_resource(resource):
         if isinstance(resource, Iterable):

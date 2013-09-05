@@ -1,7 +1,9 @@
+import sys
 from argparse import ArgumentParser
 import logging
 
 from colorlog import ColoredFormatter
+
 
 def main():
     parser = ArgumentParser()
@@ -16,17 +18,23 @@ def main():
     ]
 
     for command, module_name, help_text in subcommands:
-        module = __import__(module_name, globals(), locals(),
-                            ['populate_argparser', 'main'], level=1)
         subparser = subparsers.add_parser(command, help=help_text)
-        module.populate_argparser(subparser)
-        subparser.set_defaults(func=module.main)
+        if command in sys.argv:
+            module = __import__(module_name, globals(), locals(),
+                                ['populate_argparser', 'main'], level=1)
+            module.populate_argparser(subparser)
+            subparser.set_defaults(func=module.main)
 
     args = parser.parse_args()
 
     setup_logger()
 
+    if not args.subparser_command:
+        parser.print_help()
+        return
+
     return args.func(args)
+
 
 def setup_logger():
     formatter = ColoredFormatter(

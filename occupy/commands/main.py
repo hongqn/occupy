@@ -20,6 +20,11 @@ def main():
     for command, module_name, help_text in subcommands:
         subparser = subparsers.add_parser(command, help=help_text)
         if command in sys.argv:
+            subparser.add_argument('-v', '--verbose', dest='loglevel',
+                                   action='store_const', const=logging.DEBUG)
+            subparser.add_argument('-q', '--quiet', dest='loglevel',
+                                   action='store_const',
+                                   const=logging.WARNING)
             module = __import__(module_name, globals(), locals(),
                                 ['populate_argparser', 'main'], level=1)
             module.populate_argparser(subparser)
@@ -27,7 +32,7 @@ def main():
 
     args = parser.parse_args()
 
-    setup_logger()
+    setup_logger(args.loglevel)
 
     if not args.subparser_command:
         parser.print_help()
@@ -36,11 +41,11 @@ def main():
     return args.func(args)
 
 
-def setup_logger():
+def setup_logger(loglevel):
     formatter = ColoredFormatter(
         "%(log_color)s%(levelname)s: %(message)s")
     root = logging.getLogger()
     handler = logging.StreamHandler()
     handler.setFormatter(formatter)
     root.addHandler(handler)
-    root.setLevel(logging.INFO)
+    root.setLevel(loglevel)

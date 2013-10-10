@@ -11,7 +11,7 @@ class File(Resource):
         if not self.path.startswith(os.sep):
             raise InvalidParameter("File paths must be fully qualified, "
                                    "not %r" % self.path)
-        self.content = content
+        self.content = content.encode() if isinstance(content, str) else content
 
     def apply(self):
         exists = os.path.exists(self.path)

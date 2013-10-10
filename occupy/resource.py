@@ -1,4 +1,3 @@
-import pkgutil
 import logging
 import abc
 
@@ -28,8 +27,6 @@ NAMEVAR = NAMEVAR()
 class Resource:
     __metaclass__ = abc.ABCMeta
 
-    registry = {}
-
     def __init__(self, name):
         self.name = name
         self.logger = ResourceLogger(logger, {'resource': self})
@@ -37,29 +34,6 @@ class Resource:
     def __str__(self):
         return "{self.__class__.__name__}[{self.name!r}]".format(self=self)
 
-    @classmethod
-    def get(cls, name):
-        return cls.registry.get(name)
-
-    @classmethod
-    def register(cls, klass):
-        name = klass.__name__
-        if name in cls.registry:
-            raise Exception("name %s already registered for %s" % (
-                name, cls.registry[name]))
-        cls.registry[name] = klass
-        return klass
-
-    @classmethod
-    def iter_all(cls):
-        return []
-
     @abc.abstractmethod
     def apply(self):
         pass
-
-
-def scan_package(pkg):
-    for importer, modname, ispkg in \
-            pkgutil.walk_packages(pkg.__path__, pkg.__name__+'.'):
-        __import__(modname)

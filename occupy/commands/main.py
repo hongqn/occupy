@@ -12,10 +12,7 @@ def main():
                                        dest='subparser_command')
 
     subcommands = [
-        ('resource', 'resource',
-         "API only: interact directly with resources via the RAL."),
-        ('apply', 'apply',
-         "Apply occupy manifests locally"),
+        ('apply', 'apply', "Apply configs locally"),
     ]
 
     for command, module_name, help_text in subcommands:

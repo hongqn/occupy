@@ -3,7 +3,6 @@ from subprocess import check_call
 from occupy.resource import Resource, NAMEVAR
 
 
-@Resource.register
 class Command(Resource):
     def __init__(self, name, command=NAMEVAR):
         super(Command, self).__init__(name)

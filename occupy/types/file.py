@@ -1,13 +1,13 @@
 import os
 import difflib
 
-from occupy.resource import Resource, NAMEVAR, InvalidParameter
+from occupy.resource import Resource, IDVAR, InvalidParameter
 
 
 class File(Resource):
-    def __init__(self, name, path=NAMEVAR, content=''):
-        super(File, self).__init__(name)
-        self.path = os.path.expanduser(path or name)
+    def __init__(self, id, path=IDVAR, content='', **meta):
+        super().__init__(id, **meta)
+        self.path = os.path.expanduser(path or id)
         if not self.path.startswith(os.sep):
             raise InvalidParameter("File paths must be fully qualified, "
                                    "not %r" % self.path)
@@ -19,6 +19,8 @@ class File(Resource):
 
         if content != self.content:
             self.update(content)
+        else:
+            self.logger.debug("%s does not change", self.path)
 
     def update(self, content):
         exists = content is not None

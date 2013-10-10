@@ -3,8 +3,10 @@ import sys
 import logging
 import time
 import types
-from collections import Iterable
 from importlib import import_module
+import weakref
+
+from occupy.resource import Requirement
 
 logger = logging.getLogger(__name__)
 
@@ -20,43 +22,57 @@ def main(args):
     sys.path.insert(0, os.getcwd())
     module = import_module(args.module)
 
-    failed = apply_resource(module)
+    nfailed = apply_resource(module)
 
     time_cost = time.time() - start_time
     logging.info("Finished run in %.2f seconds", time_cost)
 
-    if failed:
-        logger.error("%d resources failed to apply", failed)
+    if nfailed:
+        logger.error("%d resources failed to apply", nfailed)
 
-    return failed
+    return nfailed
 
 
 def apply_resource(resource):
-    if isinstance(resource, types.ModuleType):
+    applier = Applier()
+    applier.apply(resource)
+    return applier.nfailed
+
+
+class Applier:
+    def __init__(self):
+        self.nfailed = 0
+        self.applied = weakref.WeakSet()
+
+    def apply(self, resource):
+        nfailed = 0
+
+        applied = (getattr(resource, 'applied', False) or
+                   resource in self.applied)
+        if applied:
+            return nfailed
+
         try:
-            apply = resource.apply
+            resource.applied = True
         except AttributeError:
-            logger.error("module %s has no apply function",
-                         resource.__name__)
-            return 1
+            self.applied.add(resource)
 
-        if not callable(main):
-            logger.error("%s.apply is not callable", resource.__name__)
-            return 1
+        if isinstance(resource, types.GeneratorType):
+            for subresource in resource:
+                failed = self.apply(subresource)
+                if failed:
+                    nfailed += failed
+                    if isinstance(subresource, Requirement):
+                        # requirement is not satisfied
+                        break
+            return nfailed
 
-        return apply_resource(apply())
-
-    elif isinstance(resource, Iterable):
-        failed = 0
-        for subresource in resource:
-            failed += apply_resource(subresource)
-        return failed
-
-    else:
         try:
-            resource.apply()
+            g = resource() if callable(resource) else resource.apply()
         except Exception:
             logger.exception("Apply %s failed", resource)
+            self.nfailed += 1
             return 1
-        else:
-            return 0
+
+        if isinstance(g, types.GeneratorType):
+            return self.apply(g)

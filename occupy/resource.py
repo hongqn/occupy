@@ -1,32 +1,41 @@
 import pkgutil
 import logging
-
-NAMEVAR = object()
+import abc
 
 logger = logging.getLogger(__name__)
 
+
 class InvalidParameter(Exception):
     pass
+
 
 class ResourceLogger(logging.LoggerAdapter):
     def process(self, msg, kwargs):
         msg = "%s: %s" % (self.extra['resource'], msg)
         return msg, kwargs
 
-class Resource(object):
+
+class NAMEVAR:
+    def __bool__(self):
+        return False
+
+    def __repr__(self):
+        return "NAMEVAR"
+
+NAMEVAR = NAMEVAR()
+
+
+class Resource:
+    __metaclass__ = abc.ABCMeta
+
     registry = {}
 
-    def __init__(self, name, **params):
+    def __init__(self, name):
         self.name = name
         self.logger = ResourceLogger(logger, {'resource': self})
-        for para, default in self.params.items():
-            if default is NAMEVAR and para not in params:
-                setattr(self, para, name)
-            else:
-                setattr(self, para, params.get(para, default))
 
     def __str__(self):
-        return "{self.__class__.__name__}({self.name!r})".format(self=self)
+        return "{self.__class__.__name__}[{self.name!r}]".format(self=self)
 
     @classmethod
     def get(cls, name):
@@ -45,10 +54,12 @@ class Resource(object):
     def iter_all(cls):
         return []
 
+    @abc.abstractmethod
+    def apply(self):
+        pass
+
 
 def scan_package(pkg):
     for importer, modname, ispkg in \
             pkgutil.walk_packages(pkg.__path__, pkg.__name__+'.'):
         __import__(modname)
-
-

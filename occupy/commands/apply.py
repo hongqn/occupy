@@ -10,7 +10,8 @@ logger = logging.getLogger(__name__)
 
 
 def populate_argparser(parser):
-    parser.add_argument('module')
+    parser.add_argument('module',
+                        help="Module or package holding apply() function")
 
 
 def main(args):
@@ -33,17 +34,17 @@ def main(args):
 def apply_resource(resource):
     if isinstance(resource, types.ModuleType):
         try:
-            main = resource.main
+            apply = resource.apply
         except AttributeError:
-            logger.error("module %s has no main function",
+            logger.error("module %s has no apply function",
                          resource.__name__)
             return 1
 
         if not callable(main):
-            logger.error("%s.main is not callable", resource.__name__)
+            logger.error("%s.apply is not callable", resource.__name__)
             return 1
 
-        return apply_resource(main())
+        return apply_resource(apply())
 
     elif isinstance(resource, Iterable):
         failed = 0
@@ -52,9 +53,8 @@ def apply_resource(resource):
         return failed
 
     else:
-        logger.info("Applying %s", resource)
         try:
-            resource()
+            resource.apply()
         except Exception:
             logger.exception("Apply %s failed", resource)
             return 1

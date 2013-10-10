@@ -6,19 +6,15 @@ from occupy.resource import Resource, NAMEVAR, InvalidParameter
 
 @Resource.register
 class File(Resource):
-    params = {
-        'content': '',
-        'path': NAMEVAR,
-    }
-
-    def __init__(self, name, **params):
-        super(File, self).__init__(name, **params)
-        self.path = os.path.expanduser(self.path)
+    def __init__(self, name, path=NAMEVAR, content=''):
+        super(File, self).__init__(name)
+        self.path = os.path.expanduser(path or name)
         if not self.path.startswith(os.sep):
             raise InvalidParameter("File paths must be fully qualified, "
                                    "not %r" % self.path)
+        self.content = content
 
-    def __call__(self):
+    def apply(self):
         exists = os.path.exists(self.path)
         content = open(self.path, 'rb').read() if exists else None
 

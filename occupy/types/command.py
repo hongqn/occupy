@@ -2,11 +2,12 @@ from subprocess import check_call
 
 from occupy.resource import Resource, NAMEVAR
 
+
 @Resource.register
 class Command(Resource):
-    params = {
-        'command': NAMEVAR,
-    }
+    def __init__(self, name, command=NAMEVAR):
+        super(Command, self).__init__(name)
+        self.command = command or self.name
 
     def __call__(self):
         check_call(self.command, shell=True)

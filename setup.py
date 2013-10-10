@@ -21,11 +21,12 @@ occupy = occupy.commands.main:main
 """
 
 # dependencies
-INSTALL_REQUIRES = ['colorlog']
+INSTALL_REQUIRES = ['colorlog', 'mako']
 TESTS_REQUIRE = ['nose']
 TEST_SUITE = 'nose.collector'
 
 here = os.path.abspath(os.path.dirname(__file__))
+
 
 def read_long_description(filename):
     path = os.path.join(here, filename)
@@ -46,7 +47,6 @@ setup(
     classifiers=CLASSIFIERS,
     py_modules=MODULES,
     packages=PACKAGES,
-    install_package_data=True,
     zip_safe=False,
     entry_points=ENTRY_POINTS,
     install_requires=INSTALL_REQUIRES,

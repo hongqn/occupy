@@ -65,7 +65,6 @@ class Resource(metaclass=ResourceMeta):
         return tmpl.format_map(vars(self))
 
 
-
 class Requirement:
     def __init__(self, require):
         self.require = require

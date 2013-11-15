@@ -68,7 +68,11 @@ class Applier:
             return nfailed
 
         try:
-            g = resource() if callable(resource) else resource.apply()
+            if callable(resource):
+                g = resource()
+            else:
+                logger.debug("Apply %s", resource)
+                g = resource.apply()
         except Exception:
             logger.exception("Apply %s failed", resource)
             self.nfailed += 1

@@ -1,12 +1,13 @@
 import os
 import difflib
 import pwd
+import grp
 
 from occupy.resource import Resource, IDVAR, InvalidParameter
 
 
 class File(Resource):
-    def __init__(self, id, path=IDVAR, content='', owner='root', group='root',
+    def __init__(self, id, path=IDVAR, content='', owner=None, group=None,
                  mode=0o644, **meta):
         super().__init__(id, **meta)
         self.path = os.path.expanduser(path or id)
@@ -57,8 +58,8 @@ class File(Resource):
         mode = st.st_mode & 0o7777
         uid = st.st_uid
         gid = st.st_gid
-        new_uid = pwd.getpwnam(self.owner).pw_uid
-        new_gid = pwd.getpwnam(self.owner).pw_gid
+        new_uid = uid if self.owner is None else pwd.getpwnam(self.owner).pw_uid
+        new_gid = gid if self.group is None else grp.getgrnam(self.group).gr_gid
         modified = False
 
         if mode != self.mode:

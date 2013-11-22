@@ -58,7 +58,7 @@ class File(Resource):
         uid = st.st_uid
         gid = st.st_gid
         new_uid = pwd.getpwnam(self.owner).pw_uid
-        new_gid = pwd.getpwnam(self.group).pw_gid
+        new_gid = pwd.getpwnam(self.owner).pw_gid
         modified = False
 
         if mode != self.mode:

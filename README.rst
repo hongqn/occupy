@@ -2,4 +2,4 @@
 Occupy
 ======
 
-A python-clone of puppet.
+Occupy is not a python-clone of puppet.

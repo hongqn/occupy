@@ -2,13 +2,15 @@ import os
 import difflib
 import pwd
 import grp
+import time
+import shutil
 
 from occupy.resource import Resource, IDVAR, InvalidParameter
 
 
 class File(Resource):
     def __init__(self, id, path=IDVAR, content='', owner=None, group=None,
-                 mode=0o644, **meta):
+                 mode=0o644, backup='/var/occupy/backup', **meta):
         super().__init__(id, **meta)
         self.path = os.path.expanduser(path or id)
         if not self.path.startswith(os.sep):
@@ -18,6 +20,7 @@ class File(Resource):
         self.owner = owner
         self.group = group
         self.mode = mode
+        self.backup_dir = backup
 
     def apply(self):
         modified = self._update_content() | self._update_owner_group()
@@ -32,6 +35,9 @@ class File(Resource):
             return False
 
         exists = content is not None
+
+        if exists:
+            self._backup()
 
         with open(self.path, 'wb') as f:
             f.write(self.content)
@@ -74,3 +80,13 @@ class File(Resource):
             modified = True
 
         return modified
+
+    def _backup(self):
+        # We have ensured self.path.startswith(os.sep) in __init__()
+        backup_path = "%s%s-%s" % (
+            self.backup_dir, self.path + time.strftime('-%Y-%m-%dT%H:%M:%S'))
+        try:
+            os.makedirs(os.path.dirname(backup_path))
+        except OSError:
+            pass
+        shutil.copy(self.path, backup_path)

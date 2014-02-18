@@ -83,7 +83,7 @@ class File(Resource):
 
     def _backup(self):
         # We have ensured self.path.startswith(os.sep) in __init__()
-        backup_path = "%s%s-%s" % (
+        backup_path = "%s%s" % (
             self.backup_dir, self.path + time.strftime('-%Y-%m-%dT%H:%M:%S'))
         try:
             os.makedirs(os.path.dirname(backup_path))
